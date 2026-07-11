@@ -3,7 +3,6 @@ import CariLokasiDonor from "../pages/carilokasidonor";
 import PermintaanDarurat from "../pages/permintaandarurat";
 import Profile from "../pages/profile";
 import RiwayatDonor from "../pages/riwayatdonor";
-import StockDarah from "../pages/stockdarah";
 
 const Routes = [
   {
@@ -25,10 +24,6 @@ const Routes = [
   {
     path: "/riwayatdonor",
     element: <RiwayatDonor />,
-  },
-  {
-    path: "/stockdarah",
-    element: <StockDarah />,
   },
 ];
 

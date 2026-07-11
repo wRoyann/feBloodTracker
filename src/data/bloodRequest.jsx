@@ -1,0 +1,58 @@
+import Profile from "../assets/profile/face.jpg";
+
+export const bloodRequests = [
+  {
+    id: 1,
+    name: "Ahmad Fauzi",
+    hospital: "RSUP Dr. Cipto Mangunkusumo",
+    bloodType: "O+",
+    bagsNeeded: 3,
+    time: "2 jam yang lalu",
+    icon: Profile,
+  },
+  {
+    id: 2,
+    name: "Siti Rahma",
+    hospital: "RS Harapan Kita",
+    bloodType: "A-",
+    bagsNeeded: 2,
+    time: "4 jam yang lalu",
+    icon: Profile,
+  },
+  {
+    id: 3,
+    name: "Budi Santoso",
+    hospital: "RSUD Tangerang",
+    bloodType: "B+",
+    bagsNeeded: 5,
+    time: "6 jam yang lalu",
+    icon: Profile,
+  },
+  {
+    id: 4,
+    name: "Dewi Lestari",
+    hospital: "RS Siloam Lippo Village",
+    bloodType: "AB+",
+    bagsNeeded: 1,
+    time: "8 jam yang lalu",
+    icon: Profile,
+  },
+  {
+    id: 5,
+    name: "Rizky Pratama",
+    hospital: "RS Hermina Tangerang",
+    bloodType: "O-",
+    bagsNeeded: 4,
+    time: "12 jam yang lalu",
+    icon: Profile,
+  },
+  {
+    id: 6,
+    name: "Nabila Putri",
+    hospital: "RSUD Kabupaten Tangerang",
+    bloodType: "A+",
+    bagsNeeded: 2,
+    time: "1 hari yang lalu",
+    icon: Profile,
+  },
+];
