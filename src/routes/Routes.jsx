@@ -1,7 +1,9 @@
 import Beranda from "../pages/beranda";
 import CariLokasiDonor from "../pages/carilokasidonor";
+import Login from "../pages/login";
 import PermintaanDarurat from "../pages/permintaandarurat";
 import Profile from "../pages/profile";
+import Register from "../pages/register";
 import RiwayatDonor from "../pages/riwayatdonor";
 
 const Routes = [
@@ -24,6 +26,14 @@ const Routes = [
   {
     path: "/riwayatdonor",
     element: <RiwayatDonor />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
 ];
 
