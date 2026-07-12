@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Droplet, X, Eye, EyeOff, ChevronDown, Building2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { useRegister } from "@/hooks/useRegister";
+import { setLocalStorage } from "@/utils/localStorage";
 
 const JENIS_ORGANISASI_OPTIONS = [
   "Rumah Sakit",
@@ -24,35 +26,33 @@ const Register = () => {
   const [isOrganisasi, setIsOrganisasi] = useState(false);
   const [jenisOrgOpen, setJenisOrgOpen] = useState(false);
   const [jenisOrganisasi, setJenisOrganisasi] = useState("");
-
+  const { mutate, isPending, isError, error } = useRegister();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
-    whatsapp: "",
     password: "",
-    confirm: "",
     nama_organisasi: "",
     alamat_organisasi: "",
     telepon_organisasi: "",
     email_organisasi: "",
+    jenis_organisasi: "",
+    password_confirmation: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!agreed) return;
-    setIsLoading(true);
 
     const payload = {
-      role_id: isOrganisasi ? 4 : 2,
       name: form.name,
       email: form.email,
-      whatsapp: form.whatsapp,
       password: form.password,
-      // hanya disertakan kalau opsi organisasi dicentang
+      role_id: isOrganisasi ? 4 : 2,
+      password_confirmation: form.password_confirmation,
       ...(isOrganisasi && {
         nama_organisasi: form.nama_organisasi,
         alamat_organisasi: form.alamat_organisasi,
@@ -62,15 +62,17 @@ const Register = () => {
       }),
     };
 
-    // TODO: sambungkan ke endpoint pendaftaran Anda
-    console.log("submit", payload);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setIsLoading(false);
+    mutate(payload, {
+      onSuccess: (data) => {
+        setLocalStorage("token", data.token);
+        navigate("/");
+      },
+    });
   };
 
   return (
     <div className="min-h-screen w-full bg-[#F4F5F7] lg:bg-white flex items-center justify-center lg:items-stretch p-4 sm:p-6 lg:p-0">
-      <div className="w-full max-w-sm lg:max-w-none lg:w-full lg:flex bg-white rounded-2xl lg:rounded-none shadow-xl lg:shadow-none border border-black/5 lg:border-0 overflow-hidden relative">
+      <div className="w-full max-w-sm lg:max-w-none lg:w-full lg:flex bg-white rounded-2xl lg:rounded-none shadow-xl lg:shadow-none border border-black/5 lg:border-0 relative">
         {/* tombol tutup — mobile only, gaya modal */}
         <button
           type="button"
@@ -81,7 +83,7 @@ const Register = () => {
         </button>
 
         {/* PANEL KIRI — hanya desktop, hero merah */}
-        <div className="hidden lg:flex lg:w-[42%] relative flex-col justify-between bg-[#E11D2E] text-white px-14 py-12 overflow-hidden">
+        <div className="hidden lg:flex lg:w-[42%] relative flex-col justify-between bg-[#E11D2E] text-white px-14 py-12">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.06]"
             style={{
@@ -193,27 +195,10 @@ const Register = () => {
                     className="h-11 bg-white border-[#1F2937]/12 focus-visible:ring-[#E11D2E]/30 focus-visible:border-[#E11D2E]/50"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="whatsapp"
-                    className="text-[#1F2937]/70 text-sm"
-                  >
-                    WhatsApp
-                  </Label>
-                  <Input
-                    id="whatsapp"
-                    type="tel"
-                    placeholder="0812xxxxxxxx"
-                    required
-                    value={form.whatsapp}
-                    onChange={handleChange("whatsapp")}
-                    className="h-11 bg-white border-[#1F2937]/12 focus-visible:ring-[#E11D2E]/30 focus-visible:border-[#E11D2E]/50"
-                  />
-                </div>
               </div>
 
               {/* ==== TOGGLE OPT-IN ORGANISASI ==== */}
-              <div className="rounded-lg border border-[#1F2937]/10 overflow-hidden">
+              <div className="rounded-lg border border-[#1F2937]/10">
                 <label className="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer select-none bg-[#1F2937]/2">
                   <div className="flex items-center gap-2.5">
                     <Building2
@@ -347,7 +332,7 @@ const Register = () => {
                           />
                         </button>
                         {jenisOrgOpen && (
-                          <div className="absolute left-0 right-0 mt-1 rounded-md border border-[#1F2937]/10 bg-white shadow-lg z-10 overflow-hidden">
+                          <div className="absolute left-0 right-0 mt-1 rounded-md border border-[#1F2937]/10 bg-white shadow-lg z-20">
                             {JENIS_ORGANISASI_OPTIONS.map((option) => (
                               <button
                                 key={option}
@@ -428,8 +413,8 @@ const Register = () => {
                       type={showConfirm ? "text" : "password"}
                       placeholder="••••••••"
                       required
-                      value={form.confirm}
-                      onChange={handleChange("confirm")}
+                      value={form.password_confirmation}
+                      onChange={handleChange("password_confirmation")}
                       className="h-11 pr-10 bg-white border-[#1F2937]/12 focus-visible:ring-[#E11D2E]/30 focus-visible:border-[#E11D2E]/50"
                     />
                     <button
@@ -478,12 +463,19 @@ const Register = () => {
                 </span>
               </label>
 
+              {isError && (
+                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {error?.response?.data?.message ||
+                    "Terjadi kesalahan. Silakan coba lagi."}
+                </div>
+              )}
+
               <Button
                 type="submit"
-                disabled={isLoading || !agreed}
+                disabled={isPending || !agreed}
                 className="w-full h-11 bg-[#E11D2E] hover:bg-[#E11D2E]/90 text-white font-medium disabled:opacity-40"
               >
-                {isLoading ? "Membuat akun…" : "Daftar Sekarang"}
+                {isPending ? "Membuat akun…" : "Daftar Sekarang"}
               </Button>
             </form>
 
