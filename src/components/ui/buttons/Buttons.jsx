@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
 
-const Buttons = ({ className, type, variant, children }) => {
+const Buttons = ({ className, type, variant, onClick, disabled, children }) => {
   return (
     <div>
-      <Button variant={variant} type={type} className={className}>
+      <Button
+        variant={variant}
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className={className}
+      >
         {children}
       </Button>
     </div>

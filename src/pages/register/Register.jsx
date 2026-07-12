@@ -65,6 +65,7 @@ const Register = () => {
     mutate(payload, {
       onSuccess: (data) => {
         setLocalStorage("token", data.token);
+        setLocalStorage("user", data.user);
         navigate("/");
       },
     });

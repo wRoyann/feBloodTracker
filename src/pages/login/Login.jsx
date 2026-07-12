@@ -1,24 +1,37 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { Droplet, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { login } from "@/api/auth";
+import { setLocalStorage } from "@/utils/localStorage";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [form, setForm] = useState({ identifier: "", password: "" });
-  const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
+
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: login,
+  });
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setIsLoading(false);
+
+    mutate(form, {
+      onSuccess: (data) => {
+        setLocalStorage("token", data.token);
+        setLocalStorage("user", data.user);
+        navigate("/");
+      },
+    });
   };
 
   return (
@@ -86,18 +99,18 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="mt-7 space-y-4">
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="identifier"
+                  htmlFor="email"
                   className="text-[#1F2937]/70 text-sm"
                 >
                   Email atau Nomor HP
                 </Label>
                 <Input
-                  id="identifier"
+                  id="email"
                   type="text"
                   placeholder="contoh@mail.com"
                   required
-                  value={form.identifier}
-                  onChange={handleChange("identifier")}
+                  value={form.email}
+                  onChange={handleChange("email")}
                   className="h-11 bg-white border-[#1F2937]/12 focus-visible:ring-[#E11D2E]/30 focus-visible:border-[#E11D2E]/50"
                 />
               </div>
@@ -158,16 +171,23 @@ const Login = () => {
                 </span>
               </label>
 
+              {isError && (
+                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {error?.response?.data?.message ||
+                    "Terjadi kesalahan. Silakan coba lagi."}
+                </div>
+              )}
+
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isPending}
                 className="w-full h-11 bg-[#E11D2E] hover:bg-[#E11D2E]/90 text-white font-medium group"
               >
-                {isLoading ? "Memeriksa…" : "Masuk"}
+                {isPending ? "Memeriksa…" : "Masuk"}
                 <span className="hidden lg:inline">
-                  {isLoading ? "" : " Sekarang"}
+                  {isPending ? "" : " Sekarang"}
                 </span>
-                {!isLoading && (
+                {!isPending && (
                   <ArrowRight
                     className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5"
                     strokeWidth={2}

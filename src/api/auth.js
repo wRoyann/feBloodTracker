@@ -7,3 +7,18 @@ export const register = (payload) => {
     data: payload,
   });
 };
+
+export const login = (payload) => {
+  return request({
+    url: "/login",
+    method: "POST",
+    data: payload,
+  });
+};
+
+export const logout = () => {
+  return request({
+    url: "/logout",
+    method: "POST",
+  });
+};
