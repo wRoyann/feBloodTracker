@@ -93,11 +93,9 @@ const AdminSidebar = () => {
         md:shadow-2xl
       "
     >
-      <div className="hidden md:flex items-center gap-2 w-full mb-6 px-2 pt-4">
+      <div className="hidden md:flex items-center gap-2 w-full px-2 pt-4">
         <Droplets className="text-[#B70011]" size={28} />
-        <h1 className="text-xl font-extrabold text-[#B70011]">
-          BloodTracker
-        </h1>
+        <h1 className="text-xl font-extrabold text-[#B70011]">BloodTracker</h1>
         <span className="ml-auto text-[10px] font-semibold bg-[#B70011] text-white px-2 py-0.5 rounded-full">
           {isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
         </span>

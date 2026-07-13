@@ -22,3 +22,10 @@ export const logout = () => {
     method: "POST",
   });
 };
+
+export const showOrganisasi = () => {
+  return request({
+    url: "/organisasi",
+    method: "GET",
+  });
+};
