@@ -21,6 +21,7 @@ import { CheckCircle, XCircle, Search, Building2, Phone } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useOrganisasi } from "@/hooks/useOrganisasi";
+import { useUpdateStatus } from "@/hooks/useUpdateStatus";
 
 const statusBadge = {
   pending:
@@ -56,7 +57,8 @@ const SkeletonRow = ({ cols }) => (
 const Master = () => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const { data, isPending, isError, error } = useOrganisasi();
+  const { data, isPending: isLoadingData, isError, error } = useOrganisasi();
+  const { mutate, isPending: isUpdateStatus } = useUpdateStatus();
 
   const filteredAccounts = data?.data
     ? data.data.filter((account) => {
@@ -129,7 +131,7 @@ const Master = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isPending ? (
+              {isLoadingData ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <SkeletonRow key={i} cols={6} />
                 ))
@@ -184,8 +186,22 @@ const Master = () => {
                       {account.status === "pending" ? (
                         <div className="flex items-center gap-1.5">
                           <Button
+                            disabled={isUpdateStatus}
                             onClick={() =>
-                              toast.success("Akun berhasil disetujui")
+                              mutate(
+                                {
+                                  id: account.id,
+                                  status: "approve",
+                                },
+                                {
+                                  onSuccess: () => {
+                                    toast.success("Akun berhasil disetujui");
+                                  },
+                                  onError: () => {
+                                    toast.error("Gagal menyetujui akun");
+                                  },
+                                },
+                              )
                             }
                             size="sm"
                             className="bg-green-600 hover:bg-green-700 text-white text-xs h-8"
@@ -194,13 +210,29 @@ const Master = () => {
                             Approve
                           </Button>
                           <Button
-                            onClick={() => toast.error("Akun berhasil ditolak")}
+                            disabled={isUpdateStatus}
+                            onClick={() =>
+                              mutate(
+                                {
+                                  id: account.id,
+                                  status: "rejected",
+                                },
+                                {
+                                  onSuccess: () => {
+                                    toast.success("Akun berhasil ditolak");
+                                  },
+                                  onError: () => {
+                                    toast.error("Gagal menolak akun");
+                                  },
+                                },
+                              )
+                            }
                             size="sm"
                             variant="outline"
                             className="text-red-600 border-red-200 hover:bg-red-50 text-xs h-8"
                           >
                             <XCircle size={14} />
-                            Reject
+                            Rejected
                           </Button>
                         </div>
                       ) : (
