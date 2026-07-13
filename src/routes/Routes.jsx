@@ -5,6 +5,7 @@ import PermintaanDarurat from "../pages/permintaandarurat";
 import Profile from "../pages/profile";
 import Register from "../pages/register";
 import RiwayatDonor from "../pages/riwayatdonor";
+import Auth from "./Auth";
 
 const Routes = [
   {
@@ -17,19 +18,35 @@ const Routes = [
   },
   {
     path: "/permintaandarurat",
-    element: <PermintaanDarurat />,
+    element: (
+      <Auth>
+        <PermintaanDarurat />
+      </Auth>
+    ),
   },
   {
     path: "/profile",
-    element: <Profile />,
+    element: (
+      <Auth>
+        <Profile />
+      </Auth>
+    ),
   },
   {
     path: "/riwayatdonor",
-    element: <RiwayatDonor />,
+    element: (
+      <Auth>
+        <RiwayatDonor />
+      </Auth>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <Auth>
+        <Login />
+      </Auth>
+    ),
   },
   {
     path: "/register",
