@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Droplet, X, Eye, EyeOff, ChevronDown, Building2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRegister } from "@/hooks/useRegister";
-import { setLocalStorage } from "@/utils/localStorage";
 
 const JENIS_ORGANISASI_OPTIONS = [
   "Rumah Sakit",
@@ -63,10 +63,15 @@ const Register = () => {
     };
 
     mutate(payload, {
-      onSuccess: (data) => {
-        setLocalStorage("token", data.token);
-        setLocalStorage("user", data.user);
-        navigate("/");
+      onSuccess: () => {
+        if (isOrganisasi) {
+          toast.success(
+            "Registrasi berhasil! Akun Anda sedang menunggu persetujuan admin."
+          );
+          navigate("/login");
+        } else {
+          navigate("/login");
+        }
       },
     });
   };

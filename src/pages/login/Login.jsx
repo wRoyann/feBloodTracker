@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Droplet, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,20 @@ const Login = () => {
       onSuccess: (data) => {
         setLocalStorage("token", data.token);
         setLocalStorage("user", data.user);
-        navigate("/");
+
+        if (data.user?.role_id === 1) {
+          navigate("/admin/master");
+        } else if (data.user?.role_id === 4) {
+          if (data.user?.organisasi?.status === "pending") {
+            toast.error("Akun Anda belum disetujui oleh admin", {
+              id: "pending-auth",
+            });
+            return;
+          }
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
       },
     });
   };
@@ -98,10 +112,7 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="mt-7 space-y-4">
               <div className="space-y-1.5">
-                <Label
-                  htmlFor="email"
-                  className="text-[#1F2937]/70 text-sm"
-                >
+                <Label htmlFor="email" className="text-[#1F2937]/70 text-sm">
                   Email atau Nomor HP
                 </Label>
                 <Input
