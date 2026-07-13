@@ -132,7 +132,7 @@ const Master = () => {
                 <TableHead>Email</TableHead>
                 <TableHead>Organization Type</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[120px]">Actions</TableHead>
+                <TableHead className="w-30">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -92,7 +92,7 @@ const Beranda = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex w-full items-center justify-between">
                       <p className="bg-[#991B1B]/10 text-[#991B1B] font-bold text-md px-5 py-2 rounded-full">
-                        URGENT
+                        {request.status}
                       </p>
                       <p className="text-[#916F6B]">{request.time}</p>
                     </div>
