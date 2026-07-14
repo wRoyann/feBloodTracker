@@ -7,6 +7,7 @@ import {
   LogOut,
   Droplets,
   Shield,
+  HeartPulse,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getLocalStorage } from "@/utils/localStorage";
@@ -20,6 +21,11 @@ const AdminSidebar = () => {
   const isSuperAdmin = user?.role_id === 1;
 
   const menuItems = [
+    {
+      path: "/admin/dashboard",
+      label: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
     ...(isSuperAdmin
       ? [
           {
@@ -27,13 +33,13 @@ const AdminSidebar = () => {
             label: "Master Admin",
             icon: <Shield size={20} />,
           },
+          {
+            path: "/admin/tipe-golongan-darah",
+            label: "Golongan Darah",
+            icon: <HeartPulse size={20} />,
+          },
         ]
       : []),
-    {
-      path: "/admin/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
-    },
     {
       path: "/admin/users",
       label: "Users",

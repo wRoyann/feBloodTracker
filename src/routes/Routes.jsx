@@ -11,6 +11,7 @@ import AdminBloodRequests from "../pages/admin/BloodRequests";
 import AdminLocations from "../pages/admin/Locations";
 import AdminSettings from "../pages/admin/Settings";
 import AdminMaster from "../pages/admin/Master";
+import TipeGolonganDarah from "../pages/admin/TipeGolonganDarah";
 import Auth from "./Auth";
 import AdminAuth from "./AdminAuth";
 import MasterAuth from "./MasterAuth";
@@ -66,6 +67,14 @@ const Routes = [
       <MasterAuth>
         <AdminMaster />
       </MasterAuth>
+    ),
+  },
+  {
+    path: "/admin/tipe-golongan-darah",
+    element: (
+      <AdminAuth>
+        <TipeGolonganDarah />
+      </AdminAuth>
     ),
   },
   {

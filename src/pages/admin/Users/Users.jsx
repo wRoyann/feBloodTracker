@@ -38,12 +38,15 @@ const Users = () => {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-12.5"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-gray-500 py-8"
+                >
                   No users found.
                 </TableCell>
               </TableRow>

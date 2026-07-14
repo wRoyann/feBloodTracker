@@ -191,7 +191,7 @@ const Master = () => {
                               mutate(
                                 {
                                   id: account.id,
-                                  status: "approve",
+                                  status: "active",
                                 },
                                 {
                                   onSuccess: () => {

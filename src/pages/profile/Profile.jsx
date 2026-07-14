@@ -73,7 +73,9 @@ const Profile = () => {
         <CustomBox>
           <div className="flex flex-col items-center">
             <div className="flex size-28 items-center justify-center rounded-full border-4 border-[#B70011]">
-              <span className="text-5xl font-extrabold text-[#B70011]">B+</span>
+              <span className="text-5xl font-extrabold text-[#B70011]">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
             </div>
 
             <h2 className="mt-6 text-4xl text-center font-bold text-[#2C1E1E]">

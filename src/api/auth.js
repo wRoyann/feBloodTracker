@@ -29,3 +29,18 @@ export const showOrganisasi = () => {
     method: "GET",
   });
 };
+
+export const showGolonganDarah = () => {
+  return request({
+    url: "/golongan-darah",
+    method: "GET",
+  });
+};
+
+export const createGolonganDarah = (payload) => {
+  return request({
+    url: "/golongan-darah",
+    method: "POST",
+    data: payload,
+  });
+};
