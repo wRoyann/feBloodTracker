@@ -1,9 +1,10 @@
 import { request } from "./request";
 
-export const showStockDarah = () => {
+export const showStockDarah = (params) => {
   return request({
     url: "/stok-darah",
     method: "GET",
+    params,
   });
 };
 

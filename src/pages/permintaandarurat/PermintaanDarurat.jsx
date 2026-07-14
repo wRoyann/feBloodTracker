@@ -7,7 +7,7 @@ const PermintaanDarurat = () => {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-center gap-4">
+        {/* <div className="flex flex-col items-center gap-4">
           <Button className="flex w-full h-14 p-4 font-semibold text-lg items-center gap-3 bg-[#B70011]">
             <Siren className="size-7 shrink-0" />
             <p>+ Buat Permintaan Darurat</p>
@@ -16,7 +16,7 @@ const PermintaanDarurat = () => {
             Gunakan tombol di atas hanya untuk situasi medis kritiss yang
             mendesak
           </h3>
-        </div>
+        </div> */}
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
             <p className="text-xl ">Permintaan Aktif</p>

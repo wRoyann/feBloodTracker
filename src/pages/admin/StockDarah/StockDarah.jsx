@@ -19,6 +19,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Search,
   Droplets,
   MapPin,
@@ -26,8 +33,10 @@ import {
   Building2,
   HeartPulse,
   Pencil,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useStockDarah, useUpdateStockDarah } from "@/hooks/useStockDarah";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -53,41 +62,61 @@ const SkeletonRow = ({ cols }) => (
 
 const StockDarah = () => {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const debouncedSearch = useDebounce(search, 300);
-  const { data, isPending, isError, error } = useStockDarah();
 
-  const items = data?.data;
+  const { data: allItems, isPending, isError, error } = useStockDarah();
+
+  useEffect(() => {
+    setPage(1);
+  }, [perPage, debouncedSearch]);
 
   const filteredData = useMemo(() => {
-    if (!items) return [];
-    if (!debouncedSearch) return items;
+    if (!allItems) return [];
+    if (!debouncedSearch) return allItems;
     const q = debouncedSearch.toLowerCase();
-    return items.filter(
+    return allItems.filter(
       (item) =>
         item.golongan_darah?.nama?.toLowerCase().includes(q) ||
         item.lokasi_donor?.nama?.toLowerCase().includes(q) ||
         item.lokasi_donor?.kota?.toLowerCase().includes(q),
     );
-  }, [items, debouncedSearch]);
+  }, [allItems, debouncedSearch]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil((filteredData.length || 0) / perPage),
+  );
+  const paginatedData = filteredData.slice(
+    (page - 1) * perPage,
+    page * perPage,
+  );
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   const summary = useMemo(() => {
-    if (!items?.length) return null;
-    const bloodTypes = new Set(items.map((s) => s.golongan_darah?.kode));
-    const locations = new Set(items.map((s) => s.lokasi_donor?.id));
-    const orgs = new Set(items.map((s) => s.organization_id));
-    const totalUnits = items.reduce((sum, s) => sum + (s.jumlah || 0), 0);
+    if (!allItems?.length) return null;
+    const bloodTypes = new Set(allItems.map((s) => s.golongan_darah?.kode));
+    const locations = new Set(allItems.map((s) => s.lokasi_donor?.id));
+    const orgs = new Set(allItems.map((s) => s.organization_id));
+    const totalUnits = allItems.reduce((sum, s) => sum + (s.jumlah || 0), 0);
     return {
       bloodTypeCount: bloodTypes.size,
       locationCount: locations.size,
       orgCount: orgs.size,
       totalUnits,
     };
-  }, [items]);
+  }, [allItems]);
 
   const perBloodType = useMemo(() => {
-    if (!items) return [];
+    if (!allItems) return [];
     const map = {};
-    items.forEach((s) => {
+    allItems.forEach((s) => {
       const kode = s.golongan_darah?.kode || "Unknown";
       if (!map[kode]) {
         map[kode] = {
@@ -104,7 +133,20 @@ const StockDarah = () => {
       ...g,
       locationCount: g.locations.size,
     }));
-  }, [items]);
+  }, [allItems]);
+
+  const pages = useMemo(() => {
+    const delta = 2;
+    const range = [];
+    for (
+      let i = Math.max(1, page - delta);
+      i <= Math.min(totalPages, page + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+    return range;
+  }, [page, totalPages]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -170,7 +212,7 @@ const StockDarah = () => {
               Gagal memuat data: {error?.message || "Terjadi kesalahan"}
             </CardContent>
           </Card>
-        ) : !items?.length ? (
+        ) : !allItems?.length ? (
           <Card className="border-red-200">
             <CardContent className="py-8 text-center text-gray-500">
               Belum ada data stok darah.
@@ -333,7 +375,7 @@ const StockDarah = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredData.map((item) => (
+                      paginatedData.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="whitespace-nowrap">
                             <div className="flex items-center gap-2">
@@ -377,6 +419,65 @@ const StockDarah = () => {
                     )}
                   </TableBody>
                 </Table>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>Tampilkan</span>
+                  <Select
+                    value={String(perPage)}
+                    onValueChange={(v) => setPerPage(Number(v))}
+                  >
+                    <SelectTrigger className="w-16 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="30">30</SelectItem>
+                      <SelectItem value="40">40</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span>
+                    {filteredData.length > 0
+                      ? `${(page - 1) * perPage + 1}-${Math.min(page * perPage, filteredData.length)} dari ${filteredData.length}`
+                      : "0 entri"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1"
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    <ChevronLeft size={14} />
+                    Prev
+                  </Button>
+                  {pages.map((p) => (
+                    <Button
+                      key={p}
+                      size="sm"
+                      variant={p === page ? "default" : "outline"}
+                      className={`h-8 min-w-8 ${p === page ? "bg-[#B70011] hover:bg-[#991B1B] text-white" : ""}`}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    Next
+                    <ChevronRight size={14} />
+                  </Button>
+                </div>
               </div>
             </div>
 
