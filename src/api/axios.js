@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getLocalStorage } from "@/utils/localStorage";
+import { getLocalStorage, removeLocalStorage } from "@/utils/localStorage";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -16,3 +16,20 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+const AUTH_PATHS = ["/login", "/register"];
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error?.response?.status === 401 &&
+      !AUTH_PATHS.some((p) => error.config?.url?.includes(p))
+    ) {
+      removeLocalStorage("token");
+      removeLocalStorage("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);

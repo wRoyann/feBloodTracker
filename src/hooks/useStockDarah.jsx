@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { showStockDarah, updateStockDarah } from "../api/stock";
+import { showStockDarah, updateStockDarah, createStockDarah } from "../api/stock";
 
 const extractData = (res) => {
   const d = res?.data;
@@ -35,6 +35,21 @@ export const useUpdateStockDarah = () => {
 
   return useMutation({
     mutationFn: ({ id, ...payload }) => updateStockDarah(id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["stok-darah"],
+        refetchType: "all",
+      });
+    },
+  });
+};
+
+export const useCreateStockDarah = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload) => createStockDarah(payload),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
