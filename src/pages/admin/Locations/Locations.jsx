@@ -16,9 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAddLocation, useLocationDonor } from "@/hooks/useLokasiDonor";
+import {
+  useAddLocation,
+  useLocationDonor,
+  useUpdateLocation,
+  useDeleteLocation,
+} from "@/hooks/useLokasiDonor";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Building2, Plus, Search } from "lucide-react";
+import { Building2, Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { getLocalStorage } from "@/utils/localStorage";
@@ -77,6 +82,27 @@ const Locations = () => {
     organization_id: getLocalStorage("user")?.organisasi?.id,
   });
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [editForm, setEditForm] = useState({
+    nama: "",
+    alamat: "",
+    kota: "",
+    telepon: "",
+    jam_operasional: "",
+    longitude: Number(1),
+    latitude: Number(1),
+    organization_id: getLocalStorage("user")?.organisasi?.id,
+  });
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteItem, setDeleteItem] = useState(null);
+
+  const { mutate: updateLocation, isPending: isUpdating } =
+    useUpdateLocation();
+  const { mutate: deleteLocation, isPending: isDeleting } =
+    useDeleteLocation();
+
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -99,6 +125,68 @@ const Locations = () => {
         toast.error(
           err?.response?.data?.message ||
             "Gagal menambahkan lokasi donor darah",
+        );
+      },
+    });
+  };
+
+  const openEditDialog = (item) => {
+    setEditItem(item);
+    setEditForm({
+      nama: item.nama || "",
+      alamat: item.alamat || "",
+      kota: item.kota || "",
+      telepon: item.telepon || "",
+      jam_operasional: item.jam_operasional || "",
+      longitude: item.longitude ? Number(item.longitude) : 1,
+      latitude: item.latitude ? Number(item.latitude) : 1,
+      organization_id:
+        item.organization_id ||
+        getLocalStorage("user")?.organisasi?.id,
+    });
+    setEditOpen(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    updateLocation(
+      { id: editItem.id, ...editForm },
+      {
+        onSuccess: () => {
+          toast.success("Lokasi donor berhasil diperbarui");
+          setEditOpen(false);
+          setEditItem(null);
+        },
+        onError: (err) => {
+          toast.error(
+            err?.response?.data?.message ||
+              "Gagal memperbarui lokasi donor",
+          );
+        },
+      },
+    );
+  };
+
+  const openDeleteDialog = (item) => {
+    setDeleteItem(item);
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteItem) return;
+    deleteLocation(deleteItem.id, {
+      onSuccess: () => {
+        toast.success("Lokasi donor berhasil dihapus");
+        setDeleteOpen(false);
+        setDeleteItem(null);
+      },
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.message || "Gagal menghapus lokasi donor",
         );
       },
     });
@@ -145,7 +233,7 @@ const Locations = () => {
                 <TableHead>Kota</TableHead>
                 <TableHead>Telephone</TableHead>
                 <TableHead>Jam Operasional</TableHead>
-                <TableHead className="w-12.5"></TableHead>
+                <TableHead className="w-24 whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -199,6 +287,26 @@ const Locations = () => {
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {donor.jam_operasional || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 text-xs"
+                          onClick={() => openEditDialog(donor)}
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50"
+                          onClick={() => openDeleteDialog(donor)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -285,7 +393,121 @@ const Locations = () => {
             </div>
           </form>
         </DialogContent>
-      </Dialog>
+        </Dialog>
+
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Lokasi Donor</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-nama">Nama</Label>
+                <Input
+                  id="edit-nama"
+                  name="nama"
+                  value={editForm.nama}
+                  onChange={handleEditChange}
+                  placeholder="Nama lokasi"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-alamat">Alamat</Label>
+                <Input
+                  id="edit-alamat"
+                  name="alamat"
+                  value={editForm.alamat}
+                  onChange={handleEditChange}
+                  placeholder="Alamat lengkap"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-kota">Kota</Label>
+                <Input
+                  id="edit-kota"
+                  name="kota"
+                  value={editForm.kota}
+                  onChange={handleEditChange}
+                  placeholder="Kota"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-telepon">Telepon</Label>
+                <Input
+                  id="edit-telepon"
+                  name="telepon"
+                  value={editForm.telepon}
+                  onChange={handleEditChange}
+                  placeholder="Nomor telepon"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-jam_operasional">Jam Operasional</Label>
+                <Input
+                  id="edit-jam_operasional"
+                  name="jam_operasional"
+                  value={editForm.jam_operasional}
+                  onChange={handleEditChange}
+                  placeholder="Contoh: 08:00 - 20:00"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="bg-[#B70011] hover:bg-[#991B1B] text-white"
+                >
+                  {isUpdating ? "Menyimpan..." : "Simpan"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Hapus Lokasi Donor</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                Apakah anda yakin ingin menghapus{" "}
+                <span className="font-semibold text-gray-900">
+                  {deleteItem?.nama || "lokasi ini"}
+                </span>
+                ? Tindakan ini tidak dapat dibatalkan.
+              </p>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDeleteOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  disabled={isDeleting}
+                  onClick={handleDeleteConfirm}
+                >
+                  {isDeleting ? "Menghapus..." : "Hapus"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
     </AdminLayout>
   );
 };

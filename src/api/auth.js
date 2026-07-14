@@ -59,3 +59,18 @@ export const addLocation = (payload) => {
     data: payload,
   });
 };
+
+export const updateLocation = (id, payload) => {
+  return request({
+    url: `/lokasi-donor/${id}`,
+    method: "PUT",
+    data: payload,
+  });
+};
+
+export const deleteLocation = (id) => {
+  return request({
+    url: `/lokasi-donor/${id}`,
+    method: "DELETE",
+  });
+};

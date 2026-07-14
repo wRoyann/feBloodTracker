@@ -35,11 +35,19 @@ import {
   Pencil,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
-import { useStockDarah, useUpdateStockDarah } from "@/hooks/useStockDarah";
+import {
+  useStockDarah,
+  useUpdateStockDarah,
+  useCreateStockDarah,
+} from "@/hooks/useStockDarah";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useGolonganDarah } from "@/hooks/useGolongan";
+import { useLocationDonor } from "@/hooks/useLokasiDonor";
+import { getLocalStorage } from "@/utils/localStorage";
 
 const bloodTypeColors = {
   A: "bg-red-100 text-red-700 border-red-200",
@@ -153,6 +161,45 @@ const StockDarah = () => {
   const [editJumlah, setEditJumlah] = useState("");
   const { mutate: updateStock, isPending: isUpdating } = useUpdateStockDarah();
 
+  const [addOpen, setAddOpen] = useState(false);
+  const { mutate: createStock, isPending: isCreating } = useCreateStockDarah();
+  const { data: golData } = useGolonganDarah();
+  const { data: lokData } = useLocationDonor();
+  const [form, setForm] = useState({
+    golongan_darah_kode: "",
+    lokasi_id: "",
+    jumlah: "",
+    organization_id: getLocalStorage("user")?.organisasi?.id,
+  });
+
+  const handleFormChange = (name, value) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddSubmit = (e) => {
+    e.preventDefault();
+    createStock(
+      { ...form, jumlah: Number(form.jumlah) },
+      {
+        onSuccess: () => {
+          toast.success("Stok darah berhasil ditambahkan");
+          setAddOpen(false);
+          setForm({
+            golongan_darah_kode: "",
+            lokasi_id: "",
+            jumlah: "",
+            organization_id: getLocalStorage("user")?.organisasi?.id,
+          });
+        },
+        onError: (err) => {
+          toast.error(
+            err?.response?.data?.message || "Gagal menambahkan stok darah",
+          );
+        },
+      },
+    );
+  };
+
   const openEditDialog = (item) => {
     setEditItem(item);
     setEditJumlah(String(item.jumlah || 0));
@@ -182,13 +229,24 @@ const StockDarah = () => {
       },
     );
   };
+  console.log(golData);
+  
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stock Darah</h1>
-          <p className="text-gray-500">Overview stok darah seluruh lokasi</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Stock Darah</h1>
+            <p className="text-gray-500">Overview stok darah seluruh lokasi</p>
+          </div>
+          <Button
+            className="bg-[#B70011] hover:bg-[#991B1B] text-white"
+            onClick={() => setAddOpen(true)}
+          >
+            <Plus size={16} />
+            Add Stock
+          </Button>
         </div>
 
         {isPending ? (
@@ -537,6 +595,90 @@ const StockDarah = () => {
             </Dialog>
           </>
         )}
+
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Tambah Stok Darah</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="golongan_darah_kode">
+                  Golongan Darah
+                </Label>
+                <Select
+                  modal={false}
+                  value={form.golongan_darah_kode}
+                  onValueChange={(v) =>
+                    handleFormChange("golongan_darah_kode", v)
+                  }
+                >
+                  <SelectTrigger id="golongan_darah_kode">
+                    <SelectValue placeholder="Pilih golongan darah" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[100]">
+                    {golData?.data?.map((gd) => (
+                      <SelectItem key={gd.kode} value={gd.kode}>
+                        {gd.kode} - {gd.nama}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lokasi_id">Lokasi</Label>
+                <Select
+                  modal={false}
+                  value={String(form.lokasi_id)}
+                  onValueChange={(v) =>
+                    handleFormChange("lokasi_id", Number(v))
+                  }
+                >
+                  <SelectTrigger id="lokasi_id">
+                    <SelectValue placeholder="Pilih lokasi" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[100]">
+                    {lokData?.data?.map((loc) => (
+                      <SelectItem key={loc.id} value={String(loc.id)}>
+                        {loc.nama} - {loc.kota}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jumlah">Jumlah</Label>
+                <Input
+                  id="jumlah"
+                  type="number"
+                  min="0"
+                  value={form.jumlah}
+                  onChange={(e) =>
+                    handleFormChange("jumlah", e.target.value)
+                  }
+                  placeholder="0"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#B70011] hover:bg-[#991B1B] text-white"
+                  disabled={isCreating}
+                >
+                  {isCreating ? "Menyimpan..." : "Simpan"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );

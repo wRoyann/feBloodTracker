@@ -15,3 +15,11 @@ export const updateStockDarah = (id, payload) => {
     data: payload,
   });
 };
+
+export const createStockDarah = (payload) => {
+  return request({
+    url: "/stok-darah",
+    method: "POST",
+    data: payload,
+  });
+};

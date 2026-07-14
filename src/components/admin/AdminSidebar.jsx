@@ -68,18 +68,10 @@ const AdminSidebar = () => {
   ];
 
   const handleLogout = () => {
-    logoutMutation.mutate(null, {
-      onSuccess: () => {
-        removeLocalStorage("token");
-        removeLocalStorage("user");
-        navigate("/login");
-      },
-      onError: () => {
-        removeLocalStorage("token");
-        removeLocalStorage("user");
-        navigate("/login");
-      },
-    });
+    removeLocalStorage("token");
+    removeLocalStorage("user");
+    logoutMutation.mutate(null);
+    navigate("/login");
   };
 
   return (
