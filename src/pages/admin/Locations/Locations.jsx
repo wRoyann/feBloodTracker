@@ -16,10 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useLocationDonor } from "@/hooks/useLokasiDonor";
+import { useAddLocation, useLocationDonor } from "@/hooks/useLokasiDonor";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Building2, Plus, Search } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
+import { getLocalStorage } from "@/utils/localStorage";
 
 const SkeletonRow = ({ cols }) => (
   <TableRow>
@@ -47,6 +49,7 @@ const SkeletonRow = ({ cols }) => (
 
 const Locations = () => {
   const { data, isPending: isLoadingData, isError, error } = useLocationDonor();
+  const { mutate: addLocation, isPending: isCreating } = useAddLocation();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
@@ -69,6 +72,9 @@ const Locations = () => {
     kota: "",
     telepon: "",
     jam_operasional: "",
+    longitude: Number(1),
+    latitude: Number(1),
+    organization_id: getLocalStorage("user")?.organisasi?.id,
   });
 
   const handleChange = (e) => {
@@ -77,8 +83,28 @@ const Locations = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setDialogOpen(false);
-    setForm({ nama: "", alamat: "", kota: "", telepon: "", jam_operasional: "" });
+    addLocation(form, {
+      onSuccess: () => {
+        toast.success("Lokasi donor berhasil ditambahkan");
+        setDialogOpen(false);
+        setForm({
+          nama: "",
+          alamat: "",
+          kota: "",
+          telepon: "",
+          jam_operasional: "",
+          longitude: "",
+          latitude: "",
+          organization_id: getLocalStorage("user")?.organisasi?.id,
+        });
+      },
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.message ||
+            "Gagal menambahkan lokasi donor darah",
+        );
+      },
+    });
   };
 
   return (
@@ -254,9 +280,10 @@ const Locations = () => {
               </Button>
               <Button
                 type="submit"
+                disabled={isCreating}
                 className="bg-[#B70011] hover:bg-[#991B1B] text-white"
               >
-                Simpan
+                {isCreating ? "Menyimpan..." : "Simpan"}
               </Button>
             </div>
           </form>

@@ -51,3 +51,11 @@ export const createGolonganDarah = (payload) => {
     data: payload,
   });
 };
+
+export const addLocation = (payload) => {
+  return request({
+    url: "/lokasi-donor",
+    method: "POST",
+    data: payload,
+  });
+};

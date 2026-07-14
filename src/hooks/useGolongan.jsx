@@ -11,7 +11,7 @@ export const useGolonganDarah = () => {
 export const useCreateGolonganDarah = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createGolonganDarah,
+    mutationFn: (...payload) => createGolonganDarah(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["golongan-darah"] });
     },
