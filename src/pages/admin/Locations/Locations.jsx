@@ -93,9 +93,6 @@ const Locations = () => {
           kota: "",
           telepon: "",
           jam_operasional: "",
-          longitude: "",
-          latitude: "",
-          organization_id: getLocalStorage("user")?.organisasi?.id,
         });
       },
       onError: (err) => {
