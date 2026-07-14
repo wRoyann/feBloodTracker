@@ -61,7 +61,7 @@ const TipeGolonganDarah = () => {
       },
       onError: (err) => {
         toast.error(
-          err?.response?.data?.message || "Gagal menambahkan golongan darah"
+          err?.response?.data?.message || "Gagal menambahkan golongan darah",
         );
       },
     });
@@ -72,9 +72,7 @@ const TipeGolonganDarah = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Golongan Darah
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">Golongan Darah</h1>
             <p className="text-gray-500">Mengelola semua golongan darah</p>
           </div>
           {isSuperAdmin && (
@@ -166,8 +164,7 @@ const TipeGolonganDarah = () => {
                     colSpan={3}
                     className="text-center text-red-600 py-8"
                   >
-                    Gagal memuat data:{" "}
-                    {error?.message || "Terjadi kesalahan"}
+                    Gagal memuat data: {error?.message || "Terjadi kesalahan"}
                   </TableCell>
                 </TableRow>
               ) : data?.data?.length === 0 || !data?.data ? (

@@ -1,7 +1,8 @@
+import Layout from "@/components/layout";
 import React from "react";
 
 const RiwayatDonor = () => {
-  return <div>RiwayatDonor</div>;
+  return <Layout></Layout>;
 };
 
 export default RiwayatDonor;

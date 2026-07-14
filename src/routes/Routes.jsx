@@ -12,6 +12,7 @@ import AdminLocations from "../pages/admin/Locations";
 import AdminSettings from "../pages/admin/Settings";
 import AdminMaster from "../pages/admin/Master";
 import TipeGolonganDarah from "../pages/admin/TipeGolonganDarah";
+import StockDarah from "../pages/admin/StockDarah";
 import Auth from "./Auth";
 import AdminAuth from "./AdminAuth";
 import MasterAuth from "./MasterAuth";
@@ -98,6 +99,14 @@ const Routes = [
     element: (
       <AdminAuth>
         <AdminBloodRequests />
+      </AdminAuth>
+    ),
+  },
+  {
+    path: "/admin/stock-darah",
+    element: (
+      <AdminAuth>
+        <StockDarah />
       </AdminAuth>
     ),
   },

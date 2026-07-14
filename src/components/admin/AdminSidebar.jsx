@@ -51,6 +51,11 @@ const AdminSidebar = () => {
       icon: <Siren size={20} />,
     },
     {
+      path: "/admin/stock-darah",
+      label: "Stock Darah",
+      icon: <Droplets size={20} />,
+    },
+    {
       path: "/admin/locations",
       label: "Locations",
       icon: <MapPin size={20} />,
