@@ -37,6 +37,13 @@ export const showGolonganDarah = () => {
   });
 };
 
+export const showLocation = () => {
+  return request({
+    url: "/lokasi-donor",
+    method: "GET",
+  });
+};
+
 export const createGolonganDarah = (payload) => {
   return request({
     url: "/golongan-darah",
